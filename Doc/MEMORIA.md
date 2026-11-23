@@ -32,7 +32,7 @@
 
 ### 1.1. La idea
 
-Quería que este backend fuese algo más que un CRUD con usuarios y registros. Me apetecía darle una temática propia, pero sin dejar de practicar lo importante de la asignatura: construir una API, trabajar con una base de datos, organizar el código, proteger rutas y hacer pruebas.
+Quería que este backend fuese algo más que un CRUD con usuarios y registros. Me apetecía darle una temática propia, pero sin dejar de practicar lo importante del proyecto individual: construir una API, trabajar con una base de datos, organizar el código, proteger rutas y hacer pruebas.
 
 De ahí salió **BLACKBOX**. La persona que juega entra en un sistema lleno de expedientes extraños. Cada caso plantea un misterio y, para resolverlo, hay que superar una serie de enigmas. No se trata de responder preguntas al azar, sino de leer, fijarse en los detalles, deducir información y, en algunos casos, entender qué hace un pequeño fragmento de código.
 
@@ -394,7 +394,7 @@ blackbox/
 │   │   └── session.model.ts
 │   ├── repositories/
 │   │   ├── user.repository.ts
-│   │   ├── case.repositoy.ts    # Pendiente de corregir el nombre
+│   │   ├── case.repository.ts    
 │   │   └── session.repository.ts
 │   ├── routes/
 │   │   ├── router.ts
@@ -421,7 +421,6 @@ blackbox/
 
 La intención es mantener una estructura que reconozca de las clases y del trabajo anterior, sin añadir carpetas o capas porque sí. En particular, **de momento no he creado una carpeta `services`**: quiero ver cómo evoluciona el ejemplo del profesor y añadirla solo si resulta necesaria para organizar la lógica del juego.
 
-> **Pequeña corrección pendiente:** renombrar `case.repositoy.ts` a `case.repository.ts`.
 
 ### 6.2. Qué hace cada capa
 
@@ -662,7 +661,7 @@ La idea es mantener una utilidad o middleware de errores para no repetir la mism
 
 ### 10.1. Por qué Vitest
 
-La primera estructura del proyecto incluía **Jest**, porque venía de trabajar con JavaScript. Cuando pasé a TypeScript también aproveché para cambiar a **Vitest**, que es la herramienta que el profesor está utilizando en su ejemplo de clase.
+La primera estructura del proyecto incluía **Jest**, porque era para trabajar con JavaScript. Cuando pasé a TypeScript también pasé a **Vitest**, que es la herramienta que el profesor ha comentado que utilizemos.
 
 Los archivos de test están preparados, aunque **todavía están vacíos en el estado actual del proyecto**. No sería correcto afirmar que las reglas del juego están probadas solo porque Vitest está instalado.
 
