@@ -11,7 +11,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      - mongo
+      - mongo:
+          condition: service_healthy # no arranca la API hasta que Mongo responde
 
   mongo:
     container_name: ${MONGO_HOST}
@@ -26,6 +27,11 @@ services:
     volumes:
       - ./database/scripts:/docker-entrypoint-initdb.d:ro
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 
 volumes:
