@@ -71,7 +71,6 @@ describe("Modelo Case", () => {
     describe("Orden del caso", () => {
         it.each([
             [0, "El orden del caso no puede ser menor que 1"],
-            [7, "El orden del caso no puede ser mayor que 6"],
             [1.5, "El orden del caso debe ser un número entero"]
         ])("rechaza order = %s", async (order, mensaje) => {
             const caso = new CaseModel({
@@ -81,6 +80,17 @@ describe("Modelo Case", () => {
 
             await expect(caso.validate()).rejects.toThrow(mensaje);
         });
+
+
+        it("permite un orden mayor que 6", async () => {
+            const caso = new CaseModel({
+                ...crearCasoValido(),
+                order: 7
+            });
+        
+            await expect(caso.validate()).resolves.toBeUndefined();
+        });
+
     });
 
     describe("Longitud de los textos del caso", () => {

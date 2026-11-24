@@ -1,0 +1,668 @@
+[
+  {
+    "code": "CASE_01",
+    "order": 1,
+    "title": "La señal sin remitente",
+    "description": "Un sistema apagado ha respondido a una llamada que nadie hizo. Hay que reconstruir el paquete, identificar su origen y localizar el registro.",
+    "completionMessage": "Se recuperó el archivo ARCHIVE-14. La señal no venía del exterior: la emitió NODE-C, que figuraba como desactivado. En el registro aparece un nombre que nadie reconoce: SOMBRA.",
+    "files": [
+      {
+        "order": 1,
+        "title": "El paquete",
+        "intro": "Solo queda un fragmento del mensaje y un pequeño registro de conexiones.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C01-E01-P01",
+            "title": "El mensaje hexadecimal",
+            "question": "¿Qué palabra forma este mensaje si cada pareja hexadecimal representa un carácter ASCII?",
+            "content": "45 43 48 4F",
+            "answer": "ECHO",
+            "explanation": "45=E, 43=C, 48=H y 4F=O."
+          },
+          {
+            "order": 2,
+            "code": "C01-E01-P02",
+            "title": "El puerto engañoso",
+            "question": "La configuración construye el puerto de conexión usando JavaScript. ¿Qué imprime exactamente console.log?",
+            "content": "const base = \"808\";\nconst offset = 2;\nconsole.log(base + offset);",
+            "answer": "8082",
+            "explanation": "\"808\" es un string. Al sumarle 2 mediante + se concatenan los valores: \"8082\", no 810."
+          },
+          {
+            "order": 3,
+            "code": "C01-E01-P03",
+            "title": "Identificador de acceso",
+            "question": "Escribe la clave de acceso usando la palabra del primer enigma y el puerto del segundo, unidos por un guion sin espacios.",
+            "content": "Formato: PALABRA-PUERTO",
+            "answer": "ECHO-8082",
+            "explanation": "Se combinan ECHO y 8082 con un guion."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "La procedencia",
+        "intro": "La clave permite leer los metadatos, pero el origen está parcialmente oculto.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C01-E02-P04",
+            "title": "Cabecera comprimida",
+            "question": "Esta cabecera está codificada en Base64. ¿Qué palabra contiene?",
+            "content": "Tk9ERQ==",
+            "answer": "NODE",
+            "explanation": "Tk9ERQ== se decodifica como NODE."
+          },
+          {
+            "order": 2,
+            "code": "C01-E02-P05",
+            "title": "Los relojes desincronizados",
+            "question": "Los relojes de los nodos no están sincronizados. Corrige sus desfases e identifica qué nodo envió primero un paquete. Contesta solo con la letra.",
+            "content": "NODE-A: 02:13:09 (reloj correcto)\nNODE-B: 02:13:07 (reloj adelantado 10 segundos)\nNODE-C: 02:13:01 (reloj atrasado 3 segundos)",
+            "answer": "B",
+            "explanation": "Horas reales: A 02:13:09; B 02:12:57; C 02:13:04. B transmitió primero."
+          },
+          {
+            "order": 3,
+            "code": "C01-E02-P06",
+            "title": "Nombre de origen",
+            "question": "Combina la palabra de la cabecera con la letra del primer emisor siguiendo el formato PALABRA-LETRA.",
+            "content": "Ejemplo de formato: SERVER-A",
+            "answer": "NODE-B",
+            "explanation": "El primer resultado del expediente es NODE y el nodo emisor, una vez corregidos los relojes, es B."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "El archivo oculto",
+        "intro": "El origen está identificado. Falta averiguar dónde se guardó la prueba.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C01-E03-P07",
+            "title": "El archivo recuperable",
+            "question": "Solo una petición ha recuperado bytes de un archivo, y no una respuesta vacía o una página de error. ¿Qué ruta fue? Responde con la barra inicial.",
+            "content": "GET /public\nStatus: 200 OK\nContent-Length: 0\n\nGET /archive\nStatus: 206 Partial Content\nContent-Length: 2048\n\nGET /admin\nStatus: 403 Forbidden\nContent-Length: 95",
+            "answer": "/ARCHIVE",
+            "explanation": "/public devolvió una respuesta vacía; /archive devolvió 2048 bytes con HTTP 206; /admin devolvió una página de error 403."
+          },
+          {
+            "order": 2,
+            "code": "C01-E03-P08",
+            "title": "Índice irregular",
+            "question": "Cada salto de bloque crece una unidad respecto al salto anterior. ¿Cuál es el siguiente índice?",
+            "content": "2, 3, 5, 8, 12, ?",
+            "answer": "17",
+            "explanation": "Los saltos son +1, +2, +3, +4 y +5. 12 + 5 = 17."
+          },
+          {
+            "order": 3,
+            "code": "C01-E03-P09",
+            "title": "Cierre del archivo",
+            "question": "Construye el identificador de archivo con el nombre de la ruta correcta (sin la barra) y el número del bloque siguiente, separados por un guion.",
+            "content": "Formato: RUTA-BLOQUE",
+            "answer": "ARCHIVE-17",
+            "explanation": "Se combina ARCHIVE con el siguiente índice, 17: ARCHIVE-17."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "CASE_02",
+    "order": 2,
+    "title": "El usuario que no existe",
+    "description": "Una identidad llamada SOMBRA aparece en los registros de un sistema, pero las fechas no cuadran. Descubre si es un intruso o algo distinto.",
+    "completionMessage": "SOMBRA no era un intruso humano. Una tarea automática intentó crear una copia de seguridad, aunque la identidad apareciera con datos imposibles. Alguien programó el borrado del archivo original para las 03:00.",
+    "files": [
+      {
+        "order": 1,
+        "title": "Una identidad imposible",
+        "intro": "La actividad del usuario SOMBRA precede incluso a su creación.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C02-E01-P01",
+            "title": "Alias desplazado",
+            "question": "Un alias se ha cifrado desplazando cada letra tres posiciones hacia delante. Retrocede tres posiciones para descifrarlo.",
+            "content": "VRPEUD",
+            "answer": "SOMBRA",
+            "explanation": "VRPEUD, retrocediendo tres letras, forma SOMBRA."
+          },
+          {
+            "order": 2,
+            "code": "C02-E01-P02",
+            "title": "Acceso denegado",
+            "question": "El token de un usuario es válido, pero el servidor le impide acceder porque no tiene permisos. ¿Qué código HTTP corresponde?",
+            "content": "Opciones: 401 = no autenticado; 403 = sin permisos; 404 = recurso inexistente",
+            "answer": "403",
+            "explanation": "El código adecuado para permisos insuficientes es 403 Forbidden."
+          },
+          {
+            "order": 3,
+            "code": "C02-E01-P03",
+            "title": "Antes de existir",
+            "question": "¿Cuántos minutos antes de su creación aparece el primer acceso del usuario? Responde solo con el número.",
+            "content": "Primer acceso de SOMBRA: 02:00\nCreación de SOMBRA: 02:02",
+            "answer": "2",
+            "explanation": "El acceso ocurrió dos minutos antes de la creación registrada."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Huellas mecánicas",
+        "intro": "La frecuencia de los accesos y un viejo mensaje sugieren automatización.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C02-E02-P04",
+            "title": "La próxima huella",
+            "question": "Los accesos siguen un intervalo fijo. ¿A qué hora será el siguiente? Usa formato HH:MM.",
+            "content": "02:00, 02:15, 02:30, ?",
+            "answer": "02:45",
+            "explanation": "La siguiente ejecución ocurre a las 02:45."
+          },
+          {
+            "order": 2,
+            "code": "C02-E02-P05",
+            "title": "Registro de ejecución",
+            "question": "Según este JSON, ¿qué actor ejecutó el proceso?",
+            "content": "{\"actor\":\"cron\",\"interactive\":false,\"host\":\"localhost\"}",
+            "answer": "CRON",
+            "explanation": "El campo actor contiene cron."
+          },
+          {
+            "order": 3,
+            "code": "C02-E02-P06",
+            "title": "Nombre de la cuenta",
+            "question": "Este texto está escrito con ROT13. ¿Qué palabra oculta?",
+            "content": "FREIVPR",
+            "answer": "SERVICE",
+            "explanation": "ROT13 convierte FREIVPR en SERVICE."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "La coartada del sistema",
+        "intro": "El registro contiene una acción legítima y una condición de autorización.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C02-E03-P07",
+            "title": "Lo que quiso conservar",
+            "question": "¿Qué archivo se creó y después se verificó? Responde con el nombre sin la extensión.",
+            "content": "02:44 BACKUP.log created\n02:45 AUDIT.log updated\n02:46 BACKUP.log verified",
+            "answer": "BACKUP",
+            "explanation": "BACKUP.log es el único archivo creado y verificado."
+          },
+          {
+            "order": 2,
+            "code": "C02-E03-P08",
+            "title": "Permiso calculado",
+            "question": "¿Cuál es el resultado de la expresión booleana? Responde TRUE o FALSE.",
+            "content": "isAdmin = false\nisOwner = true\nauthorized = isAdmin || isOwner",
+            "answer": "TRUE",
+            "explanation": "false || true da true."
+          },
+          {
+            "order": 3,
+            "code": "C02-E03-P09",
+            "title": "El veredicto",
+            "question": "¿Qué explicación encaja mejor con todas las pruebas? Responde con una de las tres opciones.",
+            "content": "Datos: accesos cada 15 minutos, actor CRON, cuenta SERVICE, interactive=false, host=localhost.\nOpciones: HUMANO / AUTOMATICO / EXTERNO",
+            "answer": "AUTOMATICO",
+            "explanation": "Las pistas corresponden a un proceso programado, no a un acceso humano externo."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "CASE_03",
+    "order": 3,
+    "title": "El archivo condenado",
+    "description": "El archivo va a eliminarse automáticamente. Hay una copia válida, pero el sistema solo permitirá recuperarla si interpretas sus instrucciones.",
+    "completionMessage": "PROTOCOLO RESTAURADO. La copia B ha sido recuperada y el borrado detenido. La supuesta anomalía era una alarma desesperada del propio sistema para proteger una prueba que iba a desaparecer.",
+    "files": [
+      {
+        "order": 1,
+        "title": "Cuenta atrás",
+        "intro": "El sistema deja un aviso, una hora límite y un objetivo de borrado.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C03-E01-P01",
+            "title": "Aviso binario",
+            "question": "Convierte cada bloque binario de ocho bits a un carácter ASCII. ¿Qué palabra aparece?",
+            "content": "01010011 01000001 01010110 01000101",
+            "answer": "SAVE",
+            "explanation": "Los cuatro caracteres son S, A, V y E."
+          },
+          {
+            "order": 2,
+            "code": "C03-E01-P02",
+            "title": "La hora exacta",
+            "question": "El registro indica que faltan cinco minutos para el borrado. ¿A qué hora ocurrirá? Usa HH:MM.",
+            "content": "02:55:00  WARNING: deletion in 5 minutes",
+            "answer": "03:00",
+            "explanation": "El borrado está previsto para las 03:00."
+          },
+          {
+            "order": 3,
+            "code": "C03-E01-P03",
+            "title": "Objetivo de la tarea",
+            "question": "¿Cuál es el objetivo de la operación de borrado? Responde con el valor de target.",
+            "content": "{\"operation\":\"wipe\",\"runAt\":\"03:00\",\"target\":\"archive\"}",
+            "answer": "ARCHIVE",
+            "explanation": "El campo target señala archive."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "La copia superviviente",
+        "intro": "Hay varias instantáneas; solo algunas se crearon a tiempo y siguen siendo válidas.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C03-E02-P04",
+            "title": "Bloques duplicados",
+            "question": "El sistema duplica el número de bloques en cada respaldo. ¿Cuántos tendrá el siguiente?",
+            "content": "2, 4, 8, 16, ?",
+            "answer": "32",
+            "explanation": "El siguiente respaldo tendría 32 bloques."
+          },
+          {
+            "order": 2,
+            "code": "C03-E02-P05",
+            "title": "Contador de bloques",
+            "question": "¿Qué valor final tendrá la variable blocks después de ejecutar estas instrucciones?",
+            "content": "let blocks = 6;\nblocks -= 2;\nblocks += 1;",
+            "answer": "5",
+            "explanation": "6 - 2 + 1 = 5."
+          },
+          {
+            "order": 3,
+            "code": "C03-E02-P06",
+            "title": "La única copia segura",
+            "question": "¿Qué copia es válida y se creó ANTES del borrado de las 03:00? Responde con su letra.",
+            "content": "Copia A: 02:57, valid=false\nCopia B: 02:58, valid=true\nCopia C: 03:01, valid=true",
+            "answer": "B",
+            "explanation": "Solo la copia B es válida y anterior a las 03:00."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "El último protocolo",
+        "intro": "La consola de recuperación exige una instrucción de seguridad compuesta por tres piezas.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C03-E03-P07",
+            "title": "El mensaje vertical",
+            "question": "Las primeras letras de las líneas forman una palabra. ¿Cuál?",
+            "content": "Primero conserva la evidencia.\nAntes de actuar, verifica la copia.\nUna vez localizada, detén el borrado.\nSi la eliminas, no habrá retorno.\nAhora escribe la orden.",
+            "answer": "PAUSA",
+            "explanation": "Las iniciales P-A-U-S-A forman PAUSA."
+          },
+          {
+            "order": 2,
+            "code": "C03-E03-P08",
+            "title": "Parámetro de recuperación",
+            "question": "¿Qué valor tiene el parámetro mode en esta ruta?",
+            "content": "POST /archive/restore?copy=B&mode=safe",
+            "answer": "SAFE",
+            "explanation": "El parámetro mode tiene el valor safe."
+          },
+          {
+            "order": 3,
+            "code": "C03-E03-P09",
+            "title": "La orden final",
+            "question": "Introduce la orden final con la palabra del enigma 7, el ID de la copia segura del enigma 6 y el modo del enigma 8, separados por guiones.",
+            "content": "Formato: ORDEN-COPIA-MODO",
+            "answer": "PAUSA-B-SAFE",
+            "explanation": "La orden válida es PAUSA-B-SAFE."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "CASE_04",
+    "order": 4,
+    "title": "La consola que miente",
+    "description": "Un informe asegura que los accesos son válidos, pero la consola muestra resultados que no encajan. Alguien ha confiado en conversiones implícitas de JavaScript.",
+    "completionMessage": "Los accesos se validaban con condiciones demasiado permisivas. El error estaba en las conversiones de tipos y las referencias compartidas, no en un usuario fantasma.",
+    "files": [
+      {
+        "order": 1,
+        "title": "El valor no era lo que parecía",
+        "intro": "Los primeros registros muestran resultados contradictorios. Analiza cómo JavaScript interpreta los valores antes de confiar en la consola.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C04-E01-P01",
+            "title": "La cadena disfrazada",
+            "question": "¿Qué imprime exactamente este console.log? Responde sin comillas.",
+            "content": "const level = \"5\";\nconsole.log(level + 2);",
+            "answer": "52",
+            "explanation": "\"5\" + 2 concatena texto y produce \"52\"."
+          },
+          {
+            "order": 2,
+            "code": "C04-E01-P02",
+            "title": "Un falso muy verdadero",
+            "question": "¿Qué imprime? Responde TRUE o FALSE.",
+            "content": "console.log(Boolean(\"false\"));",
+            "answer": "TRUE",
+            "explanation": "Boolean(\"false\") es true porque la cadena contiene caracteres."
+          },
+          {
+            "order": 3,
+            "code": "C04-E01-P03",
+            "title": "La puerta estricta",
+            "question": "¿Qué imprime la consola? Responde OPEN o LOCKED.",
+            "content": "const input = \"0\";\nconst stored = 0;\nconsole.log(input === stored ? \"OPEN\" : \"LOCKED\");",
+            "answer": "LOCKED",
+            "explanation": "Un string \"0\" no es estrictamente igual al número 0, por eso se imprime LOCKED."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Memoria compartida",
+        "intro": "Las variables y los datos recuperados parecen haber cambiado sin explicación. Examina los índices, los retornos y las referencias compartidas.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C04-E02-P04",
+            "title": "La posición perdida",
+            "question": "¿Qué letra imprime?",
+            "content": "const slots = [\"A\", \"B\", \"C\"];\nconsole.log(slots[slots.length - 2]);",
+            "answer": "B",
+            "explanation": "slots.length es 3; el índice 1 corresponde a B."
+          },
+          {
+            "order": 2,
+            "code": "C04-E02-P05",
+            "title": "El retorno inesperado",
+            "question": "¿Qué número imprime?",
+            "content": "const queue = [\"A\", \"B\"];\nconsole.log(queue.push(\"C\"));",
+            "answer": "3",
+            "explanation": "La cola pasa a tener tres elementos y push devuelve 3."
+          },
+          {
+            "order": 3,
+            "code": "C04-E02-P06",
+            "title": "La copia que no era copia",
+            "question": "¿Qué número imprime?",
+            "content": "const codes = [2, 4, 8];\nconst copy = codes;\ncopy[1] = 9;\nconsole.log(codes[1]);",
+            "answer": "9",
+            "explanation": "copy y codes referencian el mismo array y se modifica su segundo elemento."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "El parche final",
+        "intro": "La consola está cerca de revelar el fallo. Comprueba los últimos resultados y reconstruye el identificador que permitirá cerrar el caso.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C04-E03-P07",
+            "title": "Dos incrementos",
+            "question": "¿Qué número imprime?",
+            "content": "let attempts = 2;\nconsole.log(attempts++ + ++attempts);",
+            "answer": "6",
+            "explanation": "attempts++ vale 2 y deja attempts=3. ++attempts vale 4. Suma: 6."
+          },
+          {
+            "order": 2,
+            "code": "C04-E03-P08",
+            "title": "Cero también cuenta",
+            "question": "¿Qué número imprime?",
+            "content": "const active = 0;\nconsole.log(active ?? 7);",
+            "answer": "0",
+            "explanation": "0 no es null ni undefined, así que se conserva."
+          },
+          {
+            "order": 3,
+            "code": "C04-E03-P09",
+            "title": "Identificador filtrado",
+            "question": "¿Qué cadena imprime la consola? Respeta el guion.",
+            "content": "const key = [5, 2, 7];\nconsole.log(key.filter(n => n > 4).join(\"-\"));",
+            "answer": "5-7",
+            "explanation": "El filtrado produce [5,7] y join devuelve \"5-7\"."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "CASE_05",
+    "order": 5,
+    "title": "El diccionario prohibido",
+    "description": "Una indexación anómala ha enterrado instrucciones entre cuadrículas de letras, notas y registros falsificados. Recupera las palabras que activan la copia segura.",
+    "completionMessage": "Las palabras eran instrucciones de recuperación, no mensajes aleatorios. La indexación había ocultado TOKEN-RESET para proteger una copia del sistema.",
+    "files": [
+      {
+        "order": 1,
+        "title": "Palabras entre ruido",
+        "intro": "Los mensajes han quedado escondidos entre letras y secuencias aparentemente aleatorias. Recupera las primeras instrucciones.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C05-E01-P01",
+            "title": "Sopa de letras: credencial oculta",
+            "question": "La autenticación se ha completado, pero el sistema necesita identificar qué credencial se usará en las siguientes peticiones protegidas. El nombre de una de las posibles credenciales está escondido en la cuadrícula, en línea recta. ¿Cuál encuentras?",
+            "content": "M A G J W R B I\nB T U N D U D U\nX Z O S V K F T\nL S R K D W X D\nV U L N E G X F\nV P C C M N C S\nW E Z B T F C U\nH N T P N R V S",
+            "answer": "TOKEN",
+            "explanation": "TOKEN aparece en diagonal desde la fila 2, columna 2, hasta la fila 6, columna 6."
+          },
+          {
+            "order": 2,
+            "code": "C05-E01-P02",
+            "title": "Cinco líneas, una orden",
+            "question": "Lee la primera letra de cada línea. ¿Qué orden aparece?",
+            "content": "Revisa primero la copia.\nElimina los datos corruptos.\nSalva el índice.\nEspera la señal.\nTermina la comprobación.",
+            "answer": "RESET",
+            "explanation": "Las primeras letras son R-E-S-E-T."
+          },
+          {
+            "order": 3,
+            "code": "C05-E01-P03",
+            "title": "La palabra al revés",
+            "question": "El sistema guardó la acción en orden inverso. ¿Qué palabra se obtiene al darle la vuelta?",
+            "content": "KCOL",
+            "answer": "LOCK",
+            "explanation": "Al invertir KCOL obtenemos LOCK."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "El registro alterado",
+        "intro": "Algunos registros han sido modificados. Compara sus valores y descubre qué información sigue siendo fiable.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C05-E02-P04",
+            "title": "El hash inconsistente",
+            "question": "Al comparar el estado original y el recibido, ¿qué bloque ha cambiado? Contesta A, B o C.",
+            "content": "ANTES: A=7F, B=2C, C=9A\nDESPUÉS: A=7F, B=3C, C=9A",
+            "answer": "B",
+            "explanation": "El bloque B pasó de 2C a 3C."
+          },
+          {
+            "order": 2,
+            "code": "C05-E02-P05",
+            "title": "La rebanada azul",
+            "question": "¿Qué palabra imprime? No incluyas comillas.",
+            "content": "const colors = [\"red\", \"blue\", \"green\"];\nconsole.log(colors.slice(1, 2).join(\"\"));",
+            "answer": "BLUE",
+            "explanation": "slice(1,2) devuelve [\"blue\"] y join produce \"blue\"."
+          },
+          {
+            "order": 3,
+            "code": "C05-E02-P06",
+            "title": "La puerta cerrada",
+            "question": "La puerta se cerró a las 09:05. ¿Qué credencial consiguió entrar ANTES del cierre? Responde A, B o C.",
+            "content": "A: 09:04, access=denied\nB: 09:03, access=granted\nC: 09:06, access=granted",
+            "answer": "B",
+            "explanation": "Solo B obtuvo acceso a las 09:03, antes del cierre."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "La reconstrucción",
+        "intro": "Ya tenemos varias piezas del mensaje. Descifra las últimas instrucciones y combina las pistas para recuperar la secuencia correcta.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C05-E03-P07",
+            "title": "Mensaje girado",
+            "question": "Descifra este texto mediante ROT13. ¿Qué palabra obtienes?",
+            "content": "UVQR",
+            "answer": "HIDE",
+            "explanation": "Con ROT13, U→H, V→I, Q→D, R→E."
+          },
+          {
+            "order": 2,
+            "code": "C05-E03-P08",
+            "title": "La suma en binario",
+            "question": "El dispositivo entrega estos dos números binarios. Súmalos y responde con el resultado en decimal.",
+            "content": "101 + 11",
+            "answer": "8",
+            "explanation": "5 + 3 = 8."
+          },
+          {
+            "order": 3,
+            "code": "C05-E03-P09",
+            "title": "Orden de recuperación",
+            "question": "Recupera la credencial escondida en la sopa de letras y la orden obtenida leyendo las iniciales del segundo enigma del primer expediente. Construye la clave en formato CREDENCIAL-ORDEN.",
+            "content": "Formato esperado: CREDENCIAL-ORDEN (sin espacios)",
+            "answer": "TOKEN-RESET",
+            "explanation": "La clave es TOKEN-RESET."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "CASE_06",
+    "order": 6,
+    "title": "La sala de los reflejos",
+    "description": "Han aparecido tres copias del mismo informe. Dos son señuelos. Para distinguir la real tendrás que detectar resultados engañosos, descartar rutas y verificar una firma.",
+    "completionMessage": "El informe auténtico es el B. Los demás documentos estaban diseñados para confundir al verificador usando estados y valores visualmente similares.",
+    "files": [
+      {
+        "order": 1,
+        "title": "Cifras con doble cara",
+        "intro": "Los informes parecen coincidir, pero sus valores esconden diferencias importantes. Comprueba los resultados antes de elegir.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C06-E01-P01",
+            "title": "Comparación de fachada",
+            "question": "¿Qué imprime la consola? Responde TRUE o FALSE.",
+            "content": "const stored = 404;\nconsole.log(stored === \"404\");",
+            "answer": "FALSE",
+            "explanation": "El número 404 no es estrictamente igual al string \"404\"."
+          },
+          {
+            "order": 2,
+            "code": "C06-E01-P02",
+            "title": "El exponente oculto",
+            "question": "¿Qué número imprime JavaScript?",
+            "content": "console.log(2 ** 3 ** 2);",
+            "answer": "512",
+            "explanation": "Se evalúa como 2 ** (3 ** 2) = 2 ** 9 = 512."
+          },
+          {
+            "order": 3,
+            "code": "C06-E01-P03",
+            "title": "La señal correcta",
+            "question": "La política exige que el proceso se ejecute todos los viernes y ningún otro día. ¿Qué informe cumple la política? Contesta A, B o C.",
+            "content": "A: weekday=FRIDAY, executed=true\nB: weekday=MONDAY, executed=true\nC: weekday=FRIDAY, executed=false",
+            "answer": "A",
+            "explanation": "A refleja una ejecución en viernes; B contradice la regla y C muestra una ejecución omitida."
+          }
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Pasillos que regresan",
+        "intro": "Las rutas y las respuestas del sistema no siempre llevan al mismo lugar. Identifica el camino válido entre los señuelos.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C06-E02-P04",
+            "title": "Respuesta válida",
+            "question": "¿Qué ruta devolvió 200 OK? Responde solo con la ruta completa, empezando por /.",
+            "content": "GET /mirror-a -> 301\nGET /mirror-b -> 200\nGET /mirror-c -> 401",
+            "answer": "/MIRROR-B",
+            "explanation": "La única ruta que devolvió 200 fue /mirror-b."
+          },
+          {
+            "order": 2,
+            "code": "C06-E02-P05",
+            "title": "La falsa igualdad",
+            "question": "¿Qué imprime la consola? Responde TRUE o FALSE.",
+            "content": "console.log([] == false);",
+            "answer": "TRUE",
+            "explanation": "El array vacío se convierte en \"\", luego en 0; false también se convierte en 0."
+          },
+          {
+            "order": 3,
+            "code": "C06-E02-P06",
+            "title": "Secuencia del espejo",
+            "question": "¿Qué número continúa esta secuencia?",
+            "content": "1, 1, 2, 3, 5, ?",
+            "answer": "8",
+            "explanation": "5 + 3 = 8."
+          }
+        ]
+      },
+      {
+        "order": 3,
+        "title": "El documento auténtico",
+        "intro": "Solo queda verificar el informe definitivo. Contrasta las últimas pruebas y reconstruye la firma de salida.",
+        "enigmas": [
+          {
+            "order": 1,
+            "code": "C06-E03-P07",
+            "title": "Última lectura",
+            "question": "¿Qué número imprime?",
+            "content": "const data = [1, 2, 3];\nconsole.log(data.map(n => n * 2).at(-1));",
+            "answer": "6",
+            "explanation": "map produce [2,4,6] y el último elemento es 6."
+          },
+          {
+            "order": 2,
+            "code": "C06-E03-P08",
+            "title": "Dos requisitos",
+            "question": "¿Qué informe cumple AMBAS condiciones: READY y verified=true? Responde A, B o C.",
+            "content": "INFORME A: status=READY, verified=false\nINFORME B: status=READY, verified=true\nINFORME C: status=LOCKED, verified=true",
+            "answer": "B",
+            "explanation": "Solo B está listo y verificado."
+          },
+          {
+            "order": 3,
+            "code": "C06-E03-P09",
+            "title": "La firma de salida",
+            "question": "La ruta aceptada y el informe auténtico forman la firma de salida. Ambos se repiten aquí. Introduce RUTA-INFORME sin barra inicial ni espacios.",
+            "content": "Ruta aceptada: /mirror-b\nInforme verificado: B\nFormato: RUTA-INFORME",
+            "answer": "MIRROR-B-B",
+            "explanation": "La firma de salida es MIRROR-B-B."
+          }
+        ]
+      }
+    ]
+  }
+]

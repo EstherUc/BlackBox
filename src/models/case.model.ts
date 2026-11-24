@@ -138,7 +138,6 @@ const caseSchema = new Schema<ICase>({
         required: [true, "El orden del caso es obligatorio"],
         unique: [true, "El orden del caso no puede repetirse"],
         min: [1, "El orden del caso no puede ser menor que 1"],
-        max: [6, "El orden del caso no puede ser mayor que 6"],
         validate:{
             validator: Number.isInteger,
             message: "El orden del caso debe ser un número entero"
