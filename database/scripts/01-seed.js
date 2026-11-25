@@ -31,17 +31,17 @@ if (!Array.isArray(cases) || cases.length !== 6) {
 // Recorremos los casos para comprobar su estructura.
 let totalEnigmas = 0;
 
-for (const caso of cases) {
-    if (!Array.isArray(caso.files) || caso.files.length !== 3) {
-        throw new Error(`El caso ${caso.code} debe tener 3 expedientes`);
+for (const caseData of cases) {
+    if (!Array.isArray(caseData.files) || caseData.files.length !== 3) {
+        throw new Error(`El caso ${caseData.code} debe tener 3 expedientes`);
     }
 
-    for (const expediente of caso.files) {
-        if (!Array.isArray(expediente.enigmas) || expediente.enigmas.length !== 3) {
-            throw new Error(`El expediente ${expediente.title} debe tener 3 enigmas`);
+    for (const fileData of caseData.files) {
+        if (!Array.isArray(fileData.enigmas) || fileData.enigmas.length !== 3) {
+            throw new Error(`El expediente ${fileData.title} debe tener 3 enigmas`);
         }
 
-        totalEnigmas += expediente.enigmas.length;
+        totalEnigmas += fileData.enigmas.length;
     }
 }
 
@@ -50,32 +50,32 @@ print("-------------------------------- Estructura comprobada: 6 casos y", total
 
 
 // Comprueba que un campo tenga un texto válido.
-function comprobarTexto(valor, nombreCampo) {
-    if (typeof valor !== "string" || valor.trim() === "") {
-        throw new Error(`El campo ${nombreCampo} debe contener texto`);
+function validateText(value, fieldName) {
+    if (typeof value !== "string" || value.trim() === "") {
+        throw new Error(`El campo ${fieldName} debe contener texto`);
     }
 }
 
 
 
 // Comprobamos los campos obligatorios de cada documento.
-for (const caso of cases) {
-    comprobarTexto(caso.code, "code del caso");
-    comprobarTexto(caso.title, "title del caso");
-    comprobarTexto(caso.description, "description del caso");
-    comprobarTexto(caso.completionMessage, "completionMessage del caso");
+for (const caseData of cases) {
+    validateText(caseData.code, "code del caso");
+    validateText(caseData.title, "title del caso");
+    validateText(caseData.description, "description del caso");
+    validateText(caseData.completionMessage, "completionMessage del caso");
 
-    for (const expediente of caso.files) {
-        comprobarTexto(expediente.title, "title del expediente");
-        comprobarTexto(expediente.intro, "intro del expediente");
+    for (const fileData of caseData.files) {
+        validateText(fileData.title, "title del expediente");
+        validateText(fileData.intro, "intro del expediente");
 
-        for (const enigma of expediente.enigmas) {
-            comprobarTexto(enigma.code, "code del enigma");
-            comprobarTexto(enigma.title, "title del enigma");
-            comprobarTexto(enigma.question, "question del enigma");
-            comprobarTexto(enigma.content, "content del enigma");
-            comprobarTexto(enigma.answer, "answer del enigma");
-            comprobarTexto(enigma.explanation, "explanation del enigma");
+        for (const enigmaData of fileData.enigmas) {
+            validateText(enigmaData.code, "code del enigma");
+            validateText(enigmaData.title, "title del enigma");
+            validateText(enigmaData.question, "question del enigma");
+            validateText(enigmaData.content, "content del enigma");
+            validateText(enigmaData.answer, "answer del enigma");
+            validateText(enigmaData.explanation, "explanation del enigma");
         }
     }
 }
@@ -86,21 +86,21 @@ print("------------------------ Campos obligatorios comprobados");
 
 
 
-function comprobarOrdenes(elementos, nombre, maximo = null) {
-    const ordenes = elementos.map(elemento => elemento.order);
+function validateOrders(items, context, maximum = null) {
+    const orders = items.map(item => item.order);
 
     // Comprobamos que los órdenes sean enteros y estén dentro del rango.
-    if (!ordenes.every(orden =>
-        Number.isInteger(orden) &&
-        orden >= 1 &&
-        (maximo === null || orden <= maximo)
+    if (!orders.every(order =>
+        Number.isInteger(order) &&
+        order >= 1 &&
+        (maximum === null || order <= maximum)
     )) {
-        throw new Error(`Los órdenes de ${nombre} no son válidos`);
+        throw new Error(`Los órdenes de ${context} no son válidos`);
     }
 
     // Comprobamos que los órdenes no estén repetidos.
-    if (new Set(ordenes).size !== ordenes.length) {
-        throw new Error(`Hay órdenes repetidos en ${nombre}`);
+    if (new Set(orders).size !== orders.length) {
+        throw new Error(`Hay órdenes repetidos en ${context}`);
     }
 }
 
@@ -108,15 +108,15 @@ function comprobarOrdenes(elementos, nombre, maximo = null) {
 
 // Comprobamos los órdenes de los casos.
 // Los casos pueden seguir creciendo en el futuro.
-comprobarOrdenes(cases, "los casos");
+validateOrders(cases, "los casos");
 
-for (const caso of cases) {
-    comprobarOrdenes(caso.files, `los expedientes del caso ${caso.code}`, 3);
+for (const caseData of cases) {
+    validateOrders(caseData.files, `los expedientes del caso ${caseData.code}`, 3);
 
-    for (const expediente of caso.files) {
-        comprobarOrdenes(
-            expediente.enigmas,
-            `los enigmas del expediente ${expediente.order} del caso ${caso.code}`,
+    for (const fileData of caseData.files) {
+        validateOrders(
+            fileData.enigmas,
+            `los enigmas del expediente ${fileData.order} del caso ${caseData.code}`,
             3
         );
     }
@@ -128,9 +128,9 @@ print("------------------------ Órdenes comprobados correctamente");
 
 
 // Comprueba que un texto no supere el límite de caracteres.
-function comprobarMaximoTexto(valor, maximo, nombreCampo) {
-    if (valor.length > maximo) {
-        throw new Error(`El campo ${nombreCampo} no puede superar los ${maximo} caracteres`);
+function validateMaxTextLength(value, maximum, fieldName) {
+    if (value.length > maximum) {
+        throw new Error(`El campo ${fieldName} no puede superar los ${maximum} caracteres`);
     }
 }
 
@@ -138,23 +138,23 @@ function comprobarMaximoTexto(valor, maximo, nombreCampo) {
 
 
 // Comprobamos las longitudes máximas de los textos.
-for (const caso of cases) {
-    comprobarMaximoTexto(caso.code, 30, "code del caso");
-    comprobarMaximoTexto(caso.title, 100, "title del caso");
-    comprobarMaximoTexto(caso.description, 4000, "description del caso");
-    comprobarMaximoTexto(caso.completionMessage, 3000, "completionMessage del caso");
+for (const caseData of cases) {
+    validateMaxTextLength(caseData.code, 30, "code del caso");
+    validateMaxTextLength(caseData.title, 100, "title del caso");
+    validateMaxTextLength(caseData.description, 4000, "description del caso");
+    validateMaxTextLength(caseData.completionMessage, 3000, "completionMessage del caso");
 
-    for (const expediente of caso.files) {
-        comprobarMaximoTexto(expediente.title, 100, "title del expediente");
-        comprobarMaximoTexto(expediente.intro, 3000, "intro del expediente");
+    for (const fileData of caseData.files) {
+        validateMaxTextLength(fileData.title, 100, "title del expediente");
+        validateMaxTextLength(fileData.intro, 3000, "intro del expediente");
 
-        for (const enigma of expediente.enigmas) {
-            comprobarMaximoTexto(enigma.code, 30, "code del enigma");
-            comprobarMaximoTexto(enigma.title, 100, "title del enigma");
-            comprobarMaximoTexto(enigma.question, 500, "question del enigma");
-            comprobarMaximoTexto(enigma.content, 10000, "content del enigma");
-            comprobarMaximoTexto(enigma.answer, 500, "answer del enigma");
-            comprobarMaximoTexto(enigma.explanation, 4000, "explanation del enigma");
+        for (const enigmaData of fileData.enigmas) {
+            validateMaxTextLength(enigmaData.code, 30, "code del enigma");
+            validateMaxTextLength(enigmaData.title, 100, "title del enigma");
+            validateMaxTextLength(enigmaData.question, 500, "question del enigma");
+            validateMaxTextLength(enigmaData.content, 10000, "content del enigma");
+            validateMaxTextLength(enigmaData.answer, 500, "answer del enigma");
+            validateMaxTextLength(enigmaData.explanation, 4000, "explanation del enigma");
         }
     }
 }
@@ -167,9 +167,9 @@ print("------------------------ Longitudes de texto comprobadas");
 
 
 // Comprobamos que cada caso tenga un código diferente.
-const codigos = cases.map(caso => caso.code);
+const codes = cases.map(caseData => caseData.code);
 
-if (new Set(codigos).size !== codigos.length) {
+if (new Set(codes).size !== codes.length) {
     throw new Error("Hay códigos de caso repetidos en cases.json");
 }
 
@@ -193,29 +193,26 @@ print("------------------------ Índices únicos creados");
 
 
 // Insertamos los casos que todavía no existen en MongoDB.
-let casosInsertados = 0;
+let insertedCasesCount = 0;
 
-for (const caso of cases) {
-    const fecha = new Date();
+for (const caseData of cases) {
+    const timestamp = new Date();
 
-    const resultado = casesCollection.updateOne(
-        { code: caso.code },
+    const result = casesCollection.updateOne(
+        { code: caseData.code },
         {
             $setOnInsert: {
-                ...caso,
-                createdAt: fecha,
-                updatedAt: fecha,
+                ...caseData,
+                createdAt: timestamp,
+                updatedAt: timestamp,
                 __v: 0
             }
         },
         { upsert: true }
     );
 
-    casosInsertados += resultado.upsertedCount;
+    insertedCasesCount += result.upsertedCount;
 }
 
-print("------------------------ Casos nuevos insertados:", casosInsertados);
-print("------------------------ Casos que ya existían:", cases.length - casosInsertados);
-
-
-
+print("------------------------ Casos nuevos insertados:", insertedCasesCount);
+print("------------------------ Casos que ya existían:", cases.length - insertedCasesCount);
