@@ -2,207 +2,189 @@ import { describe, it, expect } from "vitest";
 import { UserModel } from "../src/models/user.model.ts";
 import type { IUser } from "../src/models/user.model.ts";
 
-
-describe("UserModel", () => {
-
-    // Usuario válido para realizar las pruebas
-    const validUser: IUser = {
-        username: "usuario123",
-        email: "usuario@gmail.com",
-        passwordHash: "Password123!",
+// USUARIO DE PRUEBA
+// Creamos siempre un usuario válido para poder modificar solo el campo
+// que queremos comprobar en cada test.
+// No usamos MongoDB: validate() comprueba el documento en memoria.
+function createValidUser(): IUser {
+    return {
+        username: "investigadora",
+        email: "investigadora@blackbox.test",
+        passwordHash: "hash-de-prueba", // No es la contraseña original.
         role: "user"
     };
+}
 
-    // VALIDACIÓN GENERAL
+describe("Modelo User", () => {
 
-    it("Debería crear un usuario válido", async () => {
-        const user = new UserModel(validUser);
+    // VALIDACIÓN GENERAL Y VALORES POR DEFECTO
+    describe("Usuario válido y valores por defecto", () => {
+        it("acepta un usuario con todos sus datos correctos", async () => {
+            const user = new UserModel(createValidUser());
 
-        await expect(user.validate()).resolves.toBeUndefined();
+            await expect(user.validate()).resolves.toBeUndefined();
+        });
+
+        it("asigna el rol user por defecto", async () => {
+            const user = new UserModel({
+                ...createValidUser(),
+                role: undefined
+            });
+
+            expect(user.role).toBe("user");
+            await expect(user.validate()).resolves.toBeUndefined();
+        });
+    });
+
+    // CAMPOS OBLIGATORIOS
+    describe("Campos obligatorios", () => {
+        // it.each ejecuta el mismo test con cada campo y su mensaje de error.
+        it.each([
+            ["username", "El nombre del usuario es obligatorio"],
+            ["email", "El email es obligatorio"],
+            ["passwordHash", "El hash de la contraseña es obligatorio"]
+        ])("rechaza un usuario sin %s", async (field, message) => {
+            const user = new UserModel(createValidUser());
+            user.set(field, undefined);
+
+            await expect(user.validate()).rejects.toThrow(message);
+        });
     });
 
     // USERNAME
+    describe("Nombre de usuario", () => {
+        it.each([
+            ["ab", "El nombre del usuario tiene que tener al menos 3 caracteres"],
+            ["x".repeat(16), "El nombre del usuario tiene que tener máximo 15 caracteres"]
+        ])("rechaza un username con longitud incorrecta: %s", async (username, message) => {
+            const user = new UserModel({ ...createValidUser(), username });
 
-    it("Debería exigir un nombre de usuario", async () => {
-        const user = new UserModel({
-            ...validUser,
-            username: undefined
+            await expect(user.validate()).rejects.toThrow(message);
         });
 
-        await expect(user.validate()).rejects.toThrow(
-            "El nombre del usuario es obligatorio"
-        );
-    });
+        it("rechaza un username formado únicamente por espacios", async () => {
+            const user = new UserModel({
+                ...createValidUser(),
+                username: "   "
+            });
 
-    it("Debería rechazar un username menor de 3 caracteres", async () => {
-        const user = new UserModel({
-            ...validUser,
-            username: "ab"
+            // trim convierte los espacios en una cadena vacía.
+            await expect(user.validate()).rejects.toThrow(
+                "El nombre del usuario es obligatorio"
+            );
         });
 
-        await expect(user.validate()).rejects.toThrow(
-            "El nombre del usuario tiene que tener al menos 3 caracteres"
-        );
-    });
+        it("elimina espacios al principio y al final del username", () => {
+            const user = new UserModel({
+                ...createValidUser(),
+                username: "  investigadora  "
+            });
 
-    it("Debería rechazar un username mayor de 15 caracteres", async () => {
-        const user = new UserModel({
-            ...validUser,
-            username: "usuario1234567890"
+            expect(user.username).toBe("investigadora");
         });
-
-        await expect(user.validate()).rejects.toThrow(
-            "El nombre del usuario tiene que tener máximo 15 caracteres"
-        );
-    });
-
-    it("Debería eliminar los espacios del username", () => {
-        const user = new UserModel({
-            ...validUser,
-            username: "  usuario123  "
-        });
-
-        expect(user.username).toBe("usuario123");
     });
 
     // EMAIL
+    describe("Correo electrónico", () => {
+        it.each(["correo-sin-arroba", "nombre@", "@dominio.com"])(
+            "rechaza un email con formato incorrecto: %s",
+            async (email) => {
+                const user = new UserModel({ ...createValidUser(), email });
 
-    it("Debería exigir un email", async () => {
-        const user = new UserModel({
-            ...validUser,
-            email: undefined
-        });
-
-        await expect(user.validate()).rejects.toThrow(
-            "El email es obligatorio"
+                await expect(user.validate()).rejects.toThrow(
+                    "El email no tiene un formato válido"
+                );
+            }
         );
-    });
 
-    it("Debería rechazar un email inválido", async () => {
-        const user = new UserModel({
-            ...validUser,
-            email: "emailincorrecto"
+        it("convierte el email a minúsculas", () => {
+            const user = new UserModel({
+                ...createValidUser(),
+                email: "PRUEBA@BLACKBOX.TEST"
+            });
+
+            expect(user.email).toBe("prueba@blackbox.test");
         });
-
-        await expect(user.validate()).rejects.toThrow(
-            "El email no tiene un formato válido"
-        );
-    });
-
-    it("Debería convertir el email a minúsculas", () => {
-        const user = new UserModel({
-            ...validUser,
-            email: "USUARIO@GMAIL.COM"
-        });
-
-        expect(user.email).toBe("usuario@gmail.com");
     });
 
     // PASSWORD HASH
+    describe("Hash de contraseña", () => {
+        it("permite guardar un hash sin validar el formato de la contraseña original", async () => {
+            const user = new UserModel({
+                ...createValidUser(),
+                passwordHash: "hash-de-prueba"
+            });
 
-    it("Debería exigir una contraseña", async () => {
-        const user = new UserModel({
-            ...validUser,
-            passwordHash: undefined
+            await expect(user.validate()).resolves.toBeUndefined();
         });
 
-        await expect(user.validate()).rejects.toThrow(
-            "La contraseña es obligatoria"
-        );
-    });
+        // Las reglas de la contraseña original se comprobarán en el registro,
+        // antes de generar el hash con bcrypt; no pertenecen a este campo.
+        it("oculta passwordHash en las consultas normales", () => {
+            const passwordPath = UserModel.schema.path("passwordHash");
 
-    it("Debería rechazar una contraseña inválida", async () => {
-        const user = new UserModel({
-            ...validUser,
-            passwordHash: "1234"
+            expect(passwordPath.options.select).toBe(false);
         });
-
-        await expect(user.validate()).rejects.toThrow(
-            "La contraseña no tiene un formato válido"
-        );
     });
 
     // ROLE
+    describe("Roles", () => {
+        it("acepta el rol user", async () => {
+            const user = new UserModel({ ...createValidUser(), role: "user" });
 
-    it("Debería asignar el rol user por defecto", async () => {
-        const user = new UserModel({
-            ...validUser,
-            role: undefined
+            await expect(user.validate()).resolves.toBeUndefined();
         });
 
-        expect(user.role).toBe("user");
+        it("acepta el rol admin", async () => {
+            const user = new UserModel({ ...createValidUser(), role: "admin" });
 
-        await expect(user.validate()).resolves.toBeUndefined();
-    });
-
-    it("Debería aceptar el rol user", async () => {
-        const user = new UserModel({
-            ...validUser,
-            role: "user"
+            await expect(user.validate()).resolves.toBeUndefined();
         });
 
-        await expect(user.validate()).resolves.toBeUndefined();
-    });
+        it("rechaza un rol distinto de user o admin", async () => {
+            const user = new UserModel(createValidUser());
+            user.set("role", "superadmin");
 
-    it("Debería aceptar el rol admin", async () => {
-        const user = new UserModel({
-            ...validUser,
-            role: "admin"
+            await expect(user.validate()).rejects.toThrow(
+                "El rol debe ser user o admin"
+            );
         });
 
-        await expect(user.validate()).resolves.toBeUndefined();
+        it("rechaza un rol nulo", async () => {
+            const user = new UserModel(createValidUser());
+            user.set("role", null);
+
+            await expect(user.validate()).rejects.toThrow(
+                "El rol es obligatorio"
+            );
+        });
     });
 
-    it("Debería rechazar un rol inválido", async () => {
-        const user = new UserModel({
-            ...validUser,
-            role: "moderator"
+    // SEGURIDAD Y CONVERSIÓN A JSON
+    describe("Seguridad y JSON", () => {
+        it("no devuelve passwordHash al convertir un usuario a JSON", () => {
+            const user = new UserModel(createValidUser());
+            const userJSON = user.toJSON();
+
+            expect(userJSON).not.toHaveProperty("passwordHash");
+            expect(userJSON.username).toBe("investigadora");
+            expect(userJSON.email).toBe("investigadora@blackbox.test");
         });
 
-        await expect(user.validate()).rejects.toThrow(
-            "El rol debe ser user o admin"
-        );
-    });
+        it("no devuelve __v al convertir un usuario a JSON", () => {
+            const user = new UserModel(createValidUser());
+            user.set("__v", 0);
 
-    it("Debería rechazar un rol nulo", async () => {
-        const user = new UserModel({
-            ...validUser,
-            role: null
+            expect(user.toJSON()).not.toHaveProperty("__v");
         });
-
-        await expect(user.validate()).rejects.toThrow(
-            "El rol es obligatorio"
-        );
     });
 
-    // SEGURIDAD Y JSON
-
-    it("No debería devolver el passwordHash en el JSON", () => {
-        const user = new UserModel(validUser);
-        const result = user.toJSON();
-
-        expect(result).not.toHaveProperty("passwordHash");
-        expect(result.username).toBe(validUser.username);
-        expect(result.email).toBe(validUser.email);
-        expect(result.role).toBe(validUser.role);
+    // CONFIGURACIÓN DE MONGOOSE
+    describe("Configuración de Mongoose", () => {
+        it("tiene los timestamps activados", () => {
+            expect(UserModel.schema.options.timestamps).toBe(true);
+        });
     });
-
-    it("No debería devolver __v en el JSON", () => {
-        const user = new UserModel(validUser);
-
-        user.set("__v", 0);
-
-        expect(user.toJSON()).not.toHaveProperty("__v");
-    });
-
-    it("Debería tener select false en passwordHash", () => {
-        expect(
-            UserModel.schema.path("passwordHash").options.select
-        ).toBe(false);
-    });
-
-    it("Debería tener los timestamps activados", () => {
-        expect(UserModel.schema.options.timestamps).toBe(true);
-    });
-
 });
+
+

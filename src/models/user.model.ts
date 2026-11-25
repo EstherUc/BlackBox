@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>({
     },
     passwordHash:{
         type: String,
-        required: [true, "La contraseña es obligatoria"],
+        required: [true, "El hash de la contraseña es obligatorio"],
         select: false, // no se devuelve en las consultas salvo que se pida con .select("+passwordHash")
     },
     role:{
