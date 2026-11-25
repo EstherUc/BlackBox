@@ -58,3 +58,4 @@ const userSchema = new Schema<IUser>({
 
 //Crear el modelo de Mongoose
 export const UserModel = model<IUser>("User", userSchema);
+
