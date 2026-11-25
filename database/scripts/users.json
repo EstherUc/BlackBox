@@ -1,0 +1,104 @@
+[
+  {
+    "username": "ana",
+    "email": "ana@blackbox.example",
+    "passwordHash": "$2b$12$RL7c4xMnqP5aM3MVB/LWmOZisVnh7tuQ92A38JmRq3h30bKq.lfv2",
+    "role": "user"
+  },
+  {
+    "username": "luis",
+    "email": "luis@blackbox.example",
+    "passwordHash": "$2b$12$YPp8PUVSm5NWUUQTD/AsHeD/str6FOOrCTkNvS6UMz.s3Nb71Rii6",
+    "role": "user"
+  },
+  {
+    "username": "mara",
+    "email": "mara@blackbox.example",
+    "passwordHash": "$2b$12$5PA9M3t0n2x8rorKk2D1jOqcjpNEbFcsf5Z/8fBQt5LROSsybs2D2",
+    "role": "user"
+  },
+  {
+    "username": "carlos",
+    "email": "carlos@blackbox.example",
+    "passwordHash": "$2b$12$8CdZTusS/xQzOByCjefD9efSZr6IEPK.TzRMH6nBhQp1OOJ6vSW3O",
+    "role": "user"
+  },
+  {
+    "username": "lucia",
+    "email": "lucia@blackbox.example",
+    "passwordHash": "$2b$12$2SJUeqNZS2dTac9INC8wh.hFZ2TTcDAiy7owUbMnucSkota2UB66C",
+    "role": "user"
+  },
+  {
+    "username": "pablo",
+    "email": "pablo@blackbox.example",
+    "passwordHash": "$2b$12$O.rLBB2hzVWHqK47tncsTuMC7S8x1MwoWqbF1jd8ejfB7cN0AH5w6",
+    "role": "user"
+  },
+  {
+    "username": "sofia",
+    "email": "sofia@blackbox.example",
+    "passwordHash": "$2b$12$/WgeBCriZH6Jyu7JtCV4Cei2YkBoD5v/oMQQhqyrK42ANZBGHdthq",
+    "role": "user"
+  },
+  {
+    "username": "diego",
+    "email": "diego@blackbox.example",
+    "passwordHash": "$2b$12$GjJOnLsM4q.DMP3OwPLDwuFu/1ZAtdjs9swTlJTLikjZ3v6k01vNW",
+    "role": "user"
+  },
+  {
+    "username": "elena",
+    "email": "elena@blackbox.example",
+    "passwordHash": "$2b$12$KTRUt/OnwdfK85J24OE.Uu7X8EBXQMRDqktaI6yTIRuIbSD7WQ9ka",
+    "role": "user"
+  },
+  {
+    "username": "nora",
+    "email": "nora@blackbox.example",
+    "passwordHash": "$2b$12$IcccTARfY229LWYucvp1RuMq0oVpDXdAwfaUg661BAg6ygnhqDpdm",
+    "role": "user"
+  },
+  {
+    "username": "hugo",
+    "email": "hugo@blackbox.example",
+    "passwordHash": "$2b$12$h3iapG5vDgO/DXivb.F6OOLIAv2t6xC6swuCJNUa2dofoVLZIXU.W",
+    "role": "user"
+  },
+  {
+    "username": "irene",
+    "email": "irene@blackbox.example",
+    "passwordHash": "$2b$12$jS2cX7ZaTqIxoi9fToXLNOMu54Wt.4bH/PB/z0Vt7YIfiBX0n0OEu",
+    "role": "user"
+  },
+  {
+    "username": "mateo",
+    "email": "mateo@blackbox.example",
+    "passwordHash": "$2b$12$1yWKxj8C7OkV1wIDO7f49ueagqM4HWz13VPSsgr4FNfxzb5d2qH/S",
+    "role": "user"
+  },
+  {
+    "username": "valeria",
+    "email": "valeria@blackbox.example",
+    "passwordHash": "$2b$12$nthT8Rq7jlXcIhnAGO0q8enlTr.O29cMnUkMrx.a7HW6eEnZDjKRG",
+    "role": "user"
+  },
+  {
+    "username": "alex",
+    "email": "alex@blackbox.example",
+    "passwordHash": "$2b$12$eSjSt0KO/ZRXyN1IVYcpEOub6J1cHeeH9VjHxBCHDnwaVWGXGe4Mq",
+    "role": "user"
+  },
+  {
+    "username": "raquel",
+    "email": "raquel@blackbox.example",
+    "passwordHash": "$2b$12$sx2WvZMO5w2OpIynNZk38.LD1G9XA.7HNAJIAQBWD9zWQSjNiVU9.",
+    "role": "user"
+  },
+  {
+    "username": "rocio",
+    "email": "rocio@blackbox.example",
+    "passwordHash": "$2b$12$kNxeeBz1HQWCXk886m4JlO/cibSWAzY0mHM2QLjWGhiJHRamX4IpW",
+    "role": "admin"
+  }
+]

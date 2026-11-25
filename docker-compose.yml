@@ -11,8 +11,8 @@ services:
       - .:/app
       - /app/node_modules
     depends_on:
-      - mongo:
-          condition: service_healthy # no arranca la API hasta que Mongo responde
+      mongo:
+        condition: service_healthy # no arranca la API hasta que Mongo responde
 
   mongo:
     container_name: ${MONGO_HOST}
