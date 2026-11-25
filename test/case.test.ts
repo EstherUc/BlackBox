@@ -272,4 +272,44 @@ describe("Modelo Case", () => {
             expect(caseDocument.files[0].enigmas[0].content).toBe(content);
         });
     });
+
+
+    // SEGURIDAD: las soluciones no deben incluirse por defecto en las consultas.
+    describe("Seguridad de los enigmas", () => {
+    
+        // Obtenemos el esquema de los enigmas embebidos.
+        function getEnigmaSchema() {
+            const fileSchema = CaseModel.schema.path("files").schema;
+        
+            if (!fileSchema) {
+                throw new Error("No se encontró el esquema de expedientes");
+            }
+        
+            const enigmaSchema = fileSchema.path("enigmas").schema;
+        
+            if (!enigmaSchema) {
+                throw new Error("No se encontró el esquema de enigmas");
+            }
+        
+            return enigmaSchema;
+        }
+    
+        it("oculta la respuesta por defecto", () => {
+            const enigmaSchema = getEnigmaSchema();
+        
+            expect(enigmaSchema.path("answer").options.select).toBe(false);
+        });
+    
+        it("oculta la explicación por defecto", () => {
+            const enigmaSchema = getEnigmaSchema();
+        
+            expect(enigmaSchema.path("explanation").options.select).toBe(false);
+        });
+    });
+
+
+
+
 });
+
+
