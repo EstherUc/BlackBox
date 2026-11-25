@@ -32,7 +32,6 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: [true, "La contraseña es obligatoria"],
         select: false, // no se devuelve en las consultas salvo que se pida con .select("+passwordHash")
-        match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, "La contraseña no tiene un formato válido"] // Exige mínimo 8 caracteres, al menos una letra minúscula, una mayúscula, un número y un carácter especial.
     },
     role:{
         type: String,
