@@ -79,13 +79,15 @@ const enigmaSchema = new Schema<IEnigma>({
         type: String,
         required: [true, "La respuesta del enigma es obligatoria"],
         trim: true,
-        maxlength: [500, "La respuesta no puede superar los 500 caracteres"]
+        maxlength: [500, "La respuesta no puede superar los 500 caracteres"],
+        select: false //No recuperamos la solución por defecto
     },
     explanation:{
         type: String,
         required: [true, "La explicación del enigma es obligatoria"],
         trim: true,
-        maxlength: [4000, "La explicación no puede superar los 4000 caracteres"]
+        maxlength: [4000, "La explicación no puede superar los 4000 caracteres"],
+        select: false //No recuperamos la explicación por defecto
     }
 });
 
