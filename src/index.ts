@@ -5,7 +5,7 @@ import connectDB from "./config/dbMongo.ts";
 // import cookieParser from "cookie-parser";
 // import router from "./routes/router.ts";
 // import { swaggerUi, swaggerSpec } from "./config/swagger.ts";
-// import { notFound, errorHandler } from "./middlewares/error.middleware.ts";
+import { notFound, errorHandler } from "./middlewares/error.middleware.ts";
 
 //creamos la aplicación Express.
 const app = express();
@@ -36,8 +36,8 @@ app.get("/health", (_req, res) => {
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Los middlewares de errores (siempre van después de las rutas)
-// app.use(notFound);    // Si ninguna ruta responde, devuelve un error 404.
-// app.use(errorHandler); // Gestiona los errores de forma centralizada.
+app.use(notFound);    // Si ninguna ruta responde, devuelve un error 404.
+app.use(errorHandler); // Gestiona los errores de forma centralizada.
 
 // Primero conectamos con MongoDB. Si falla la conexión, connectDB detiene la aplicación.
 await connectDB();
