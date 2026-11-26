@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/dbMongo.ts";
 // import cookieParser from "cookie-parser";
-// import router from "./routes/router.ts";
+import router from "./routes/router.ts";
 // import { swaggerUi, swaggerSpec } from "./config/swagger.ts";
 import { notFound, errorHandler } from "./middlewares/error.middleware.ts";
 
@@ -19,18 +19,8 @@ app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 // Leerá las cookies de las peticiones
 // app.use(cookieParser()); //rellena req.cookies
 
-
-// Ruta de prueba para comprobar que la API está funcionando.
-app.get("/health", (_req, res) => {
-    res.status(200).json({
-        status: "ok",
-        message: "La API de BLACKBOX está funcionando"
-    });
-});
-
-
 // rutas de la API.
-// app.use("/api", router);
+app.use("/api", router);
 
 // Documentación interactiva de Swagger.
 // app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
