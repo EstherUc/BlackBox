@@ -149,10 +149,23 @@ describe("Autenticación", () => {
             expect(response.body.data).not.toHaveProperty("passwordHash");
 
             // Set-Cookie nos permite comprobar que el backend envió la cookie.
-            const cookies = response.headers["set-cookie"] as string[] | undefined;
-            const tokenCookie = cookies?.find((cookie) => cookie.startsWith("token="));
-            expect(tokenCookie).toBeDefined();
-            expect(tokenCookie).toContain("HttpOnly");
+            // 1. Obtenemos la cabecera Set-Cookie de la respuesta del login.
+            const setCookie: unknown = response.headers["set-cookie"];
+                
+            // 2. Convertimos el resultado en un array de cookies.
+            const cookies = Array.isArray(setCookie)
+                ? setCookie
+                : typeof setCookie === "string" ? [setCookie] : [];
+                
+            // 3. AQUÍ BUSCAMOS la cookie que se llama "token".
+            const tokenCookie = cookies.find(
+                (cookie: unknown) =>
+                    typeof cookie === "string" && cookie.startsWith("token=")
+    );
+
+    // 4. Comprobamos que existe y que tiene HttpOnly.
+    expect(tokenCookie).toBeDefined();
+    expect(tokenCookie).toContain("HttpOnly");
         });
 
         it("rechaza un email que no existe", async () => {
