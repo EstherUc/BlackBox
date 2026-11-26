@@ -29,7 +29,7 @@ app.get("/health", (_req, res) => {
 });
 
 
-// rutas de nuestra API.
+// rutas de la API.
 // app.use("/api", router);
 
 // Documentación interactiva de Swagger.
