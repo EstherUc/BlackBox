@@ -13,7 +13,7 @@ export const createUser = async (data: IUser) => {
 //BUSCAR USUARIO POR EMAIL
 //La contraseña tiene select: false en el esquema, así que hay que pedirla con "+passwordHash"
 export const getUserByEmail = async (email: string) => {
-    return UserModel.findOne({ email: email.toLocaleLowerCase() }).select("+passworHash");
+    return UserModel.findOne({ email: email.toLocaleLowerCase() }).select("+passwordHash");
 };
 
 

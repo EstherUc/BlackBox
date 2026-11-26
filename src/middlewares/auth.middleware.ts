@@ -1,14 +1,31 @@
-import type { RequestHandler } from "express";
+import type { RequestHandler, Request } from "express";
 import { HttpError } from "../utils/HttpError.ts";
 import { env } from "../config/env.ts";
 import jwt from "jsonwebtoken";
 
+
+//Busca el JWT en la cabecera Authorization o en la cookie.
+//Si llegan ambos, damos prioridad a la cabecera.
+const getToken = (req: Request): string | undefined => {
+    const authorization = req.headers.authorization;
+
+    if (authorization?.startsWith("Bearer ")) {
+        const token = authorization.slice(7).trim();
+        return token || undefined;
+    }
+
+    const token: unknown = req.cookies?.token;
+
+    return typeof token === "string" ? token : undefined;
+};
+
+
 //comprueba el JWT que el navegador envía en la cookie "token".
 //si es válido, deja los datos del usuario en req.user para la siguiente función.
 export const isAuthenticated: RequestHandler = (req, _res, next) => {
-    const token: unknown = req.cookies?.token;
+    const token: unknown = req.cookies?.token; //obtener el token
 
-    if (typeof token !== "string") {
+    if (typeof token !== "string") { //comprobar tipo del token
         next(new HttpError(401, "No has iniciado sesión"));
         return;
     }

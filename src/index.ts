@@ -2,7 +2,7 @@ import { env } from "./config/env.ts"; //carga y valida el .en (si falta algo, n
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/dbMongo.ts";
-// import cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import router from "./routes/router.ts";
 // import { swaggerUi, swaggerSpec } from "./config/swagger.ts";
 import { notFound, errorHandler } from "./middlewares/error.middleware.ts";
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors({ origin: env.FRONTEND_URL, credentials: true }));
 
 // Leerá las cookies de las peticiones
-// app.use(cookieParser()); //rellena req.cookies
+app.use(cookieParser()); //rellena req.cookies
 
 // rutas de la API.
 app.use("/api", router);

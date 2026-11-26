@@ -28,13 +28,12 @@ export const notFound: RequestHandler = (req, _res, next) => {
  * @param err - El error lanzado (throw) o pasado con next(error)
  * @param req - No lo usa
  * @param res - Responde con el status y el mensaje correspondientes
- * @param next - Obligatorio en la firma (4 parámetros = manejador de errores), aunque no se use
- * Express lo reconoce porque recibe 4 parámetros.
+ * @param next - Delega el error en Express si la respuesta ya ha comenzado
  * Va el ÚLTIMO en index.ts y recibe cualquier error: los que lanzamos nosotros
  * (HttpError) y los que lanzan Mongoose o Express.
  */
 export const errorHandler: ErrorRequestHandler = (err, _req, res, next) => {
-    // Si ya se empezó a enviar una respuesta, delegamos en Express.
+    // Si ya se empezó a enviar una respuesta, delegamos en Express (para que errorHandler no intente enviar una segunda)
     if (res.headersSent) {
         next(err);
         return;

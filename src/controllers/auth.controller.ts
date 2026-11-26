@@ -97,7 +97,7 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
 
     //el JWT contiene los datos mínimos (y sin importancia, porque esto no va cifrado, es base64) para identificar al usuario.
     const payload: AuthUser = {
-        userId: user._id.toString(),
+        userId: user._id.toString(), //aquí obtenemos el id que mongoDB asignó al usuario y lo convertimos a texto para guardarlo dentro del JWT
         username: user.username,
         role: user.role
     };
