@@ -16,7 +16,7 @@ const userSchema = new Schema<IUser>({
     username:{
         type: String,
         required: [true, "El nombre del usuario es obligatorio"],
-        unique: [true, "El nombre del usuario no puede repetirse"],
+        unique: true,
         trim: true,
         minlength: [3, "El nombre del usuario tiene que tener al menos 3 caracteres"],
         maxlength: [15, "El nombre del usuario tiene que tener máximo 15 caracteres"]
@@ -24,7 +24,7 @@ const userSchema = new Schema<IUser>({
     email:{
         type: String,
         required: [true, "El email es obligatorio"],
-        unique: [true, "El email no puede repetirse"],
+        unique: true,
         lowercase: true,
         match: [/^\S+@\S+\.\S+$/, "El email no tiene un formato válido"]
     },
