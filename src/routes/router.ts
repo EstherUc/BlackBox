@@ -15,7 +15,7 @@ router.get("/health", (req: Request, res: Response): void => {
 
 
 router.use("/auth", authRouter); //todas las rutas de autentificación empezarán por /api/auth
-router.use("/case", caseRouter); //todas las rutas de casos empezarán por /api/cases
+router.use("/cases", caseRouter); //todas las rutas de casos empezarán por /api/cases
 
 
 
