@@ -23,9 +23,9 @@ const getToken = (req: Request): string | undefined => {
 //comprueba el JWT que el navegador envía en la cookie "token".
 //si es válido, deja los datos del usuario en req.user para la siguiente función.
 export const isAuthenticated: RequestHandler = (req, _res, next) => {
-    const token: unknown = req.cookies?.token; //obtener el token
+    const token = getToken(req); //Buscamos el token en Authorization o en la cookie
 
-    if (typeof token !== "string") { //comprobar tipo del token
+    if (!token) { //Si no encontramos ningún token
         next(new HttpError(401, "No has iniciado sesión"));
         return;
     }
