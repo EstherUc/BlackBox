@@ -1,4 +1,4 @@
-import type { CookieOptions, Request, Response } from "express";
+import type { CookieOptions, RequestHandler } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.ts";
@@ -41,7 +41,9 @@ const TOKEN_DURATION_MS = 24 * 60 * 60 * 1000; //24h
  * Comprueba los datos, genera el hash con bcrypt y crea el usuario.
  * El rol siempre será "user": nadie puede registrarse como administrador.
  */
-export const register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
+//RequestHandler<Params, ResBody, ReqBody>
+//No tenemos parámetros en la URL y el body será RegisterBody.
+export const register: RequestHandler<{}, unknown, RegisterBody> = async (req, res) => {
     const { username, email, password, passwordRepeat } = req.body ?? {};
 
     //No confiamos en los tipos de los datos enviados por el cliente (por si acaso)
@@ -81,7 +83,9 @@ export const register = async (req: Request<{}, {}, RegisterBody>, res: Response
  * POST /api/auth/login
  * Comprueba email y contraseña. Si son correctos, crea una cookie HttpOnly.
  */
-export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
+//RequestHandler<Params, ResBody, ReqBody>
+//Indicamos que el body del login tiene la estructura LoginBody.
+export const login: RequestHandler<{}, unknown, LoginBody> = async (req, res) => {
     const { email, password } = req.body ?? {};
 
     if (typeof email !== "string" || typeof password !== "string") {
@@ -115,7 +119,8 @@ export const login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
  * GET /api/auth/me
  * Devuelve los datos del usuario autenticado (sin su hash)
  */
-export const me = async (req: Request, res: Response) => {
+//es el tipo de la función
+export const me: RequestHandler = async (req, res)  => {
     if (!req.user) {
         throw new HttpError(401, "No has iniciado sesión");
     }
@@ -132,7 +137,8 @@ export const me = async (req: Request, res: Response) => {
  * POST /api/auth/logout
  * Borra la cookie. Un JWT ya emitido no se revoca en el servidor
  */
-export const logout = (_req: Request, res: Response): void => {
+//RequestHandler es el tipo de la función
+export const logout: RequestHandler = (_req, res) => {
     res.clearCookie("token", TOKEN_COOKIE_OPTIONS);
     res.json({ message: "Sesión cerrada" });
 };
