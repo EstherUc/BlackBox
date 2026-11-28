@@ -1,5 +1,7 @@
 import { Router, type Request, type Response} from "express";
 import authRouter from "./auth.routes.ts";
+import caseRouter from "./case.routes.ts";
+
 
 
 //enrutador principal
@@ -11,10 +13,9 @@ router.get("/health", (req: Request, res: Response): void => {
 });
 
 
-//todas las rutas de autentificación comenzarán por /api/auth
-router.use("/auth", authRouter);
 
-//rutas
+router.use("/auth", authRouter); //todas las rutas de autentificación empezarán por /api/auth
+router.use("/case", caseRouter); //todas las rutas de casos empezarán por /api/cases
 
 
 
