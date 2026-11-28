@@ -132,13 +132,13 @@ const caseSchema = new Schema<ICase>({
         type: String,
         required: [true, "El código del caso es obligatorio"],
         trim: true,
-        unique: [true, "El código del caso tiene que ser único"],
+        unique: true,
         maxlength: [30, "El código no puede superar los 30 caracteres"]
     },
     order: {
         type: Number,
         required: [true, "El orden del caso es obligatorio"],
-        unique: [true, "El orden del caso no puede repetirse"],
+        unique: true,
         min: [1, "El orden del caso no puede ser menor que 1"],
         validate:{
             validator: Number.isInteger,
